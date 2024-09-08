@@ -5,6 +5,8 @@ import "../temp.css";
 import pdfIcon from "../pdf-icon.png";
 import imageIcon from "../image-icon.png"; // Add path to document icon image
 import dragDropIcon from "../drag-drop-icon.png"; // Add path to drag-drop icon image
+// import docxIcon;
+import docxIcon from "../docx-icon.png";
 import { useNavigate } from "react-router-dom";
 
 export default function FileUpload() {
@@ -18,8 +20,11 @@ export default function FileUpload() {
   };
 
   const getFileType = (file) => {
-    if (file.name.split(".")[1] === "pdf") {
+    const fileType = file.name.split(".")[1];
+    if (fileType === "pdf") {
       return pdfIcon;
+    } else if (fileType === "docx") {
+      return docxIcon;
     } else {
       return imageIcon;
     }
@@ -78,7 +83,7 @@ export default function FileUpload() {
             <input
               type="file"
               id="fileInput"
-              accept=".pdf,.png,.jpg,.jpeg"
+              accept=".pdf,.png,.jpg,.jpeg,.docx"
               multiple
               onChange={handleFiles}
               hidden
@@ -89,7 +94,7 @@ export default function FileUpload() {
                 alt="Drag and Drop"
                 className="drag-drop-icon"
               />
-              <p>Browse Files (pdf, .png, .jpeg)</p>
+              <p>Browse Files (pdf, .png, .jpeg,.jpg, .docx)</p>
               {/* <button className="browse-button">Browse Files</button> */}
             </label>
           </div>

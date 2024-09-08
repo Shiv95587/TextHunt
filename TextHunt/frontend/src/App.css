@@ -102,8 +102,15 @@
   margin: 0 auto;
 }
 
+@media (max-width: 750px) {
+  .ocr-section {
+    width: 100%;
+  }
+}
+
 .search-input {
   width: calc(100% - 40px); /* Adjust width for input */
+  margin: 0 8px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 20px; /* Adjust border radius */
@@ -114,10 +121,12 @@
 
 .loader {
   display: flex;
+  flex-direction: column;
+  gap: 1rem;
   justify-content: center;
   align-items: center;
   height: 100px;
-  font-size: 24px;
+  font-size: 16px;
   color: #333;
 }
 
@@ -125,16 +134,16 @@
   margin-top: 15px;
   position: absolute;
   top: 50%;
-  right: 0;
-  /* transform: translateY(-50%); */
-  transform: translate(-25%, -46%);
-  width: 40px; /* Adjust button width */
-  height: 38px; /* Adjust button height */
-  background-color: #fff; /* Google's search button color */
+  right: 1px;
+  transform: translate(-25%, -48%);
+  width: 40px;
+  height: 38px;
+  background-color: #fff;
   border: none;
-  border-radius: 50%; /*Adjust border radius*/
+  border-radius: 50%;
   cursor: pointer;
   transition: background-color 0.3s;
+  /* left: 5%; */
 }
 
 .search-button:hover {

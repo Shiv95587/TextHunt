@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function SearchBar({
@@ -8,6 +8,10 @@ export default function SearchBar({
   setLoading,
   isWordSearch,
 }) {
+  useEffect(() => {
+    handleQuerySubmit();
+  }, [isWordSearch]);
+
   const handleQuerySubmit = async () => {
     if (query.length === 0) {
     } else {

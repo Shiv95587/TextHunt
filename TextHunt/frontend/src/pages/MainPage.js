@@ -2,6 +2,7 @@ import { useState } from "react";
 import SearchBar from "../components/SearchBar";
 import "../App.css";
 import "../MainPage.css";
+import CircularProgress from "@mui/material/CircularProgress";
 export default function MainPage() {
   const [query, setQuery] = useState("");
   // const location = useLocation();
@@ -14,7 +15,12 @@ export default function MainPage() {
   };
 
   const Loader = () => {
-    return <div className="loader">Loading...</div>;
+    return (
+      <div className="loader">
+        <CircularProgress />
+        <p>Processing...</p>
+      </div>
+    );
   };
   const handleOptionChange = (isWordSearch) => {
     setIsWordSearch(isWordSearch);
@@ -87,7 +93,9 @@ export default function MainPage() {
                 </div>
               ))}
             {results.length === 0 && (
-              <p>Your Search does not match any documents</p>
+              <p style={{ textAlign: "center" }}>
+                Your Search does not match any documents
+              </p>
             )}
           </div>
         )}

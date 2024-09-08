@@ -51,6 +51,8 @@ def get_relevant_docs_with_pageno(ranked_documents, tokens):
                 pdf_document.close()
             elif is_image(doc_path):
                 highlight_text_in_image(tokens, doc_path, results)
+            elif is_docx(doc_path):
+                highlight_text_in_docx(doc_path, tokens, results)    
     return results
 
 def get_highlighted_file_output_path(doc_path):
@@ -62,6 +64,9 @@ def is_pdf(document):
 def is_image(document):
     return document.split(".")[-1] in ('jpg', 'png', 'jpeg')
 
+def is_docx(document):
+    return document.split(".")[-1] == "docx"
+    
 def get_text_from_pdf(pdf_path):
     pdf_document = fitz.open(pdf_path)
     text = ""
@@ -94,6 +99,8 @@ def get_phrase_match(query, input_documents):
                 image = Image.open(input_documents[i])
                 draw = ImageDraw.Draw(image)
                 image.save(get_highlighted_file_output_path(input_documents[i]))
+        elif is_docx(input_documents[i]):
+            highlight_phrase_in_docx(input_documents[i], query, relevant_docs)
     return relevant_docs
 
 def get_relevant_results(query, input_documents):
@@ -105,8 +112,12 @@ def get_relevant_results(query, input_documents):
             text = get_text_from_pdf(input_documents[i])
             stemmed_text = preprocess_text(text, porter_stemmer)
             docs.append(stemmed_text)
-        else:
+        elif is_image(input_documents[i]):
             text = ocr_image(input_documents[i])
+            stemmed_text = preprocess_text(text, porter_stemmer)
+            docs.append(stemmed_text)
+        elif is_docx(input_documents[i]):
+            text = get_text_from_docx(input_documents[i])
             stemmed_text = preprocess_text(text, porter_stemmer)
             docs.append(stemmed_text)
 
@@ -120,3 +131,56 @@ def proximity_search(query, documents, doc_paths):
     similarities = cosine_similarity(query_vector, tfidf_matrix)
     ranked_docs = sorted(zip(similarities[0], doc_paths), reverse=True)
     return ranked_docs
+
+
+from docx import Document
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+
+def get_text_from_docx(docx_file):
+    doc = Document(docx_file)
+    print(doc)
+    text = []
+    for paragraph in doc.paragraphs:
+        text.append(paragraph.text)
+    
+    return "\n".join(text)
+
+from spire.doc import Document as SpireDocument
+from spire.doc.common import *
+
+def highlight_text_in_docx(doc_path, tokens, results):
+    document = SpireDocument()
+    document.LoadFromFile(doc_path)
+    isMatch = False
+    for token in tokens:
+        textSelections = document.FindAllString(token, False, False)    
+        # Loop through all the instances
+        for selection in textSelections:
+            isMatch = True
+        # Get the current instance as a single text range
+            textRange = selection.GetAsOneRange()
+            # Highlight the text range with a color
+            textRange.CharacterFormat.HighlightColor = Color.get_Yellow()
+    # Save the resulting document
+    if isMatch:
+        results[get_highlighted_file_output_path(doc_path=doc_path)].add(1)
+        document.SaveToFile(get_highlighted_file_output_path(doc_path))
+    document.Close()
+
+
+def highlight_phrase_in_docx(doc_path, query, relevant_docs):
+    document = SpireDocument()
+    document.LoadFromFile(doc_path)
+    textSelections = document.FindAllString(query, False, True)    
+    for selection in textSelections:
+        # Get the current instance as a single text range
+        textRange = selection.GetAsOneRange()
+        # Highlight the text range with a color
+        textRange.CharacterFormat.HighlightColor = Color.get_Yellow()    
+    # Save the resulting document
+    if(len(textSelections) > 0):
+        relevant_docs[get_highlighted_file_output_path(doc_path)].add(1)
+        document.SaveToFile(get_highlighted_file_output_path(doc_path))
+    document.Close()
+
