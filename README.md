@@ -27,7 +27,7 @@ Check out the video walkthrough of the project here:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/TextHunt.git
+   git clone https://github.com/Shiv95587/TextHunt.git
 
 Here are the snapshots of website
 ![image](https://github.com/user-attachments/assets/f668d774-961b-4fd9-855e-d8f297abac06)
