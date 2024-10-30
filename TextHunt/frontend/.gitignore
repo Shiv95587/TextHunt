@@ -5,11 +5,15 @@
 /.pnp
 .pnp.js
 
+
 # testing
 /coverage
 
 # production
 /build
+
+# Python virtual environment
+venv/
 
 # misc
 .DS_Store
