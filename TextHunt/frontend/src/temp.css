@@ -180,3 +180,33 @@ nav h1 {
   color: #444;
   line-height: 1.6;
 }
+
+.upload-container {
+  position: relative;
+}
+
+.loading-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px; /* Reduced height */
+  background-color: #e0e0e0;
+  overflow: hidden;
+}
+
+.loading-progress {
+  height: 100%;
+  background-color: #4caf50;
+  width: 100%;
+  animation: loading 1s linear infinite;
+}
+
+@keyframes loading {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}

@@ -3,20 +3,20 @@ import axios from "axios";
 import "../temp.css";
 
 import pdfIcon from "../pdf-icon.png";
-import imageIcon from "../image-icon.png"; // Add path to document icon image
-import dragDropIcon from "../drag-drop-icon.png"; // Add path to drag-drop icon image
-// import docxIcon;
+import imageIcon from "../image-icon.png";
+import dragDropIcon from "../drag-drop-icon.png";
 import docxIcon from "../docx-icon.png";
 import { useNavigate } from "react-router-dom";
 
 export default function FileUpload() {
   const [files, setFiles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+
   const handleFiles = (event) => {
     const selectedFiles = Array.from(event.target.files);
     setFiles((files) => [...files, ...selectedFiles]);
-    // setFiles(selectedFiles);
   };
 
   const getFileType = (file) => {
@@ -36,6 +36,7 @@ export default function FileUpload() {
 
   const Upload = async () => {
     try {
+      setIsLoading(true); // Start loading
       const formData = new FormData();
       files.forEach((file) => {
         formData.append("file", file);
@@ -52,10 +53,11 @@ export default function FileUpload() {
       );
 
       console.log(response.data);
-
+      setIsLoading(false); // Stop loading
       navigate("/search");
     } catch (error) {
       console.error("Error uploading file:", error);
+      setIsLoading(false); // Stop loading on error
     }
   };
 
@@ -69,34 +71,35 @@ export default function FileUpload() {
         </nav>
         <div className="header-content">
           <p className="tagline">Intelligent Document Search & Highlighting</p>
-          {/* <p className="description">
-            Effortlessly find and highlight relevant text across multiple
-            document formats (.jpeg, .jpg, .png, .pdf) with precision. Enter
-            your query and let TextHunt deliver the best results, making it
-            easier to locate key information in your documents.
-          </p> */}
         </div>
       </header>
       <div className="file-upload-container">
-        <div className="upload-section">
-          <div className="upload-box">
-            <input
-              type="file"
-              id="fileInput"
-              accept=".pdf,.png,.jpg,.jpeg,.docx"
-              multiple
-              onChange={handleFiles}
-              hidden
-            />
-            <label htmlFor="fileInput" className="upload-label">
-              <img
-                src={dragDropIcon}
-                alt="Drag and Drop"
-                className="drag-drop-icon"
+        <div className="upload-container">
+          {isLoading && (
+            <div className="loading-bar">
+              <div className="loading-progress"></div>
+            </div>
+          )}
+          <div className={`upload-section ${isLoading ? "disabled" : ""}`}>
+            <div className="upload-box">
+              <input
+                type="file"
+                id="fileInput"
+                accept=".pdf,.png,.jpg,.jpeg,.docx"
+                multiple
+                onChange={handleFiles}
+                hidden
+                disabled={isLoading} // Disable file input during upload
               />
-              <p>Browse Files (pdf, .png, .jpeg,.jpg, .docx)</p>
-              {/* <button className="browse-button">Browse Files</button> */}
-            </label>
+              <label htmlFor="fileInput" className="upload-label">
+                <img
+                  src={dragDropIcon}
+                  alt="Drag and Drop"
+                  className="drag-drop-icon"
+                />
+                <p>Browse Files (pdf, .png, .jpeg, .jpg, .docx)</p>
+              </label>
+            </div>
           </div>
         </div>
 
@@ -113,6 +116,7 @@ export default function FileUpload() {
                 <button
                   className="remove-button"
                   onClick={() => handleRemoveFile(index)}
+                  disabled={isLoading} // Disable remove button during upload
                 >
                   Remove
                 </button>
@@ -121,7 +125,7 @@ export default function FileUpload() {
           ))}
         </div>
 
-        {files.length > 0 && (
+        {files.length > 0 && !isLoading && (
           <button className="upload-button" onClick={Upload}>
             Upload Files
           </button>

@@ -1,7 +1,7 @@
 import os
 import shutil
 from flask import jsonify, request, send_file
-from utils import get_results, convert_to_json_output
+from utils import get_results, convert_to_json_output, convert_docx_to_pdf
 
 def create_routes(app):
     
@@ -21,6 +21,19 @@ def create_routes(app):
                 return 'No selected file', 400
 
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            
+             # Check if the file is a DOCX
+            if file.filename.split(".")[-1].lower() == "docx":
+                pdf_path = os.path.splitext(file_path)[0] + ".pdf"  # New PDF path with the same name
+                print("Converting DOCX to PDF, output path:", pdf_path)
+
+                # Convert DOCX to PDF
+                convert_docx_to_pdf(file_path, pdf_path)
+
+                # Delete the original DOCX file
+                os.remove(file_path)
+                print("Deleted original DOCX file:", file_path)
 
         return jsonify({'message': 'Files uploaded successfully'}), 200
 
@@ -36,6 +49,7 @@ def create_routes(app):
         isWordSearch = request.args.get('isWordSearch')
         directory = 'uploads/'
         file_paths = [os.path.join(directory, file) for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
+        
 
         results = get_results(query, file_paths, isWordSearch)
         results = convert_to_json_output(results)

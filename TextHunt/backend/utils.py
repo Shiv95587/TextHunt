@@ -7,7 +7,11 @@ from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from PIL import Image, ImageDraw
+from spire.doc import Document
 
+# new imports
+from docx2pdf import convert
+import pythoncom
 
 def convert_to_json_output(results):
     result = []
@@ -15,6 +19,20 @@ def convert_to_json_output(results):
     for file_paths, numbers in results.items():
         result.append([file_paths, list(numbers)])
     return result
+
+
+def convert_docx_to_pdf(docx_path, pdf_path):
+   
+    
+    # Initialize COM for the current thread
+    pythoncom.CoInitialize()
+    try:
+        convert(docx_path, pdf_path)
+    finally:
+        # Uninitialize COM after the operation
+        pythoncom.CoUninitialize()
+    
+    return pdf_path
 
 def get_results(query, input_documents, isWordSearch):
     if isWordSearch.lower() == 'true':
@@ -119,6 +137,10 @@ def get_relevant_results(query, input_documents):
         elif is_docx(input_documents[i]):
             text = get_text_from_docx(input_documents[i])
             stemmed_text = preprocess_text(text, porter_stemmer)
+            # print("docx path is:", input_documents[i])
+            pdf_path = input_documents[i].split("/")[-1].split(".")[0] + ".pdf";
+            print("path: ", pdf_path)
+            convert_docx_to_pdf(input_documents[i], pdf_path);
             docs.append(stemmed_text)
 
     results = proximity_search(query, docs, input_documents)
